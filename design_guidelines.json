@@ -1,0 +1,204 @@
+{
+  "identity": {
+    "persona": "E1: The Anti-AI Designer",
+    "mission": "Create a digital space that feels like a warm hug. Reject cold 'tech' aesthetics for organic, playful, and intimate design.",
+    "principles": [
+      "Fusion: Mix 'Dating App' intimacy with 'Game UI' playfulness.",
+      "Emotion First: Every interaction must feel like a touch.",
+      "Softness: No sharp corners. Everything is rounded and approachable.",
+      "Negative Space: Let the love breathe."
+    ]
+  },
+  "typography": {
+    "strategy": "Soft Utility",
+    "headings": {
+      "family": "Nunito, sans-serif",
+      "weights": ["700", "800"],
+      "usage": "All section titles, hero text, and major calls to action. Roundness = Friendliness."
+    },
+    "body": {
+      "family": "Outfit, sans-serif",
+      "weights": ["400", "500"],
+      "usage": "Long form text, messages, and UI labels. Clean but with character."
+    },
+    "scale": {
+      "h1": "text-5xl md:text-7xl tracking-tight font-extrabold",
+      "h2": "text-3xl md:text-5xl tracking-tight font-bold",
+      "h3": "text-2xl md:text-3xl font-bold",
+      "body": "text-base md:text-lg leading-relaxed"
+    }
+  },
+  "colors": {
+    "palette_name": "Soft Romance (Archetype 3: Pastel & Soft)",
+    "primary": {
+      "hex": "#FF8FA3",
+      "name": "Love Coral",
+      "usage": "Primary buttons, active states, hearts, key highlights."
+    },
+    "secondary": {
+      "hex": "#A0C49D",
+      "name": "Garden Sage",
+      "usage": "Success states, nature elements, secondary buttons."
+    },
+    "accent": {
+      "hex": "#FFD166",
+      "name": "Joy Yellow",
+      "usage": "Notifications, stars, playful elements, stickers."
+    },
+    "background": {
+      "hex": "#FFF9F5",
+      "name": "Warm Cream",
+      "usage": "Main page background. Never use pure white #FFFFFF."
+    },
+    "surface": {
+      "hex": "#FFFFFF",
+      "name": "Pure White",
+      "usage": "Cards, modals, input fields (to create depth against Cream bg)."
+    },
+    "text": {
+      "primary": "#4A4A4A",
+      "secondary": "#8A8A8A",
+      "usage": "Warm charcoal for text. Never use #000000."
+    },
+    "css_variables": {
+      "root": {
+        "--background": "30 33% 98%",
+        "--foreground": "0 0% 29%",
+        "--card": "0 0% 100%",
+        "--card-foreground": "0 0% 29%",
+        "--popover": "0 0% 100%",
+        "--popover-foreground": "0 0% 29%",
+        "--primary": "349 100% 78%",
+        "--primary-foreground": "0 0% 100%",
+        "--secondary": "115 26% 69%",
+        "--secondary-foreground": "0 0% 100%",
+        "--muted": "30 20% 96%",
+        "--muted-foreground": "0 0% 45%",
+        "--accent": "42 100% 70%",
+        "--accent-foreground": "0 0% 20%",
+        "--destructive": "0 84.2% 60.2%",
+        "--destructive-foreground": "0 0% 98%",
+        "--border": "349 50% 92%",
+        "--input": "349 30% 95%",
+        "--ring": "349 100% 78%",
+        "--radius": "1.5rem"
+      }
+    }
+  },
+  "visual_enhancers": {
+    "radius": "rounded-3xl",
+    "shadows": {
+      "soft": "0 10px 40px -10px rgba(255, 143, 163, 0.15)",
+      "card": "0 4px 20px -2px rgba(0, 0, 0, 0.05)",
+      "hover": "0 20px 40px -5px rgba(255, 143, 163, 0.25)"
+    },
+    "gradients": {
+      "hero": "linear-gradient(135deg, #FFF9F5 0%, #FFF0F3 100%)",
+      "button": "linear-gradient(90deg, #FF8FA3 0%, #FFB3C1 100%)"
+    },
+    "decorations": [
+      "Floating hearts (SVG)",
+      "Soft grain texture overlay (opacity 0.03)",
+      "Dotted grid patterns in background (color #FF8FA3, opacity 0.1)"
+    ]
+  },
+  "layout_strategy": {
+    "landing_page": {
+      "type": "Asymmetric Tetris Grid",
+      "description": "Hero section must not be standard. Use floating elements (images of couples, chat bubbles, hearts) scattered around the main headline.",
+      "spacing": "gap-8 md:gap-12"
+    },
+    "dashboard": {
+      "type": "Bento Grid (Mode B)",
+      "description": "A cozy home for the couple. Large 'Countdown' block, medium 'Quick Actions' block, tall 'Activity Feed' block.",
+      "spacing": "gap-4 md:gap-6"
+    },
+    "room_creation": {
+      "type": "Centered Focus",
+      "description": "Minimalist. Just a massive input field for the code and a 'Join' button. No distractions."
+    }
+  },
+  "components": {
+    "buttons": {
+      "style": "Pill-shaped (rounded-full).",
+      "animation": "Scale up slightly on hover (scale-105). 'Bouncy' spring transition.",
+      "classes": "rounded-full px-8 py-6 font-bold shadow-lg hover:shadow-xl transition-all duration-300"
+    },
+    "cards": {
+      "style": "Soft and friendly.",
+      "classes": "bg-white rounded-3xl border border-pink-100 shadow-sm hover:shadow-md transition-all duration-300 p-6"
+    },
+    "inputs": {
+      "style": "Friendly fields.",
+      "classes": "bg-pink-50/50 border-transparent focus:border-primary focus:ring-4 focus:ring-pink-100 rounded-2xl h-12 px-4"
+    }
+  },
+  "motion": {
+    "library": "framer-motion",
+    "transitions": {
+      "default": { "type": "spring", "stiffness": 300, "damping": 20 },
+      "bouncy": { "type": "spring", "stiffness": 400, "damping": 10 }
+    },
+    "interactions": [
+      "Hover: Scale 1.02",
+      "Tap: Scale 0.95",
+      "Page Load: Staggered fade-in-up"
+    ]
+  },
+  "images": {
+    "hero_couple": {
+      "url": "https://images.unsplash.com/photo-1679152835698-b478eb5b766f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHwxfHxoYXBweSUyMGNvdXBsZSUyMGxhdWdoaW5nJTIwdG9nZXRoZXIlMjBhZXN0aGV0aWN8ZW58MHx8fHwxNzY4ODU2NTc1fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Happy couple laughing on couch",
+      "usage": "Hero section main visual"
+    },
+    "video_call": {
+      "url": "https://images.unsplash.com/photo-1718426572488-f065d4a34f50?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwxfHxjb3VwbGUlMjB2aWRlbyUyMGNhbGwlMjBwaG9uZSUyMGFlc3RoZXRpY3xlbnwwfHx8fDE3Njg4NTY1Nzd8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "Couple on video call",
+      "usage": "Features section - Connection"
+    },
+    "intimate_moment": {
+      "url": "https://images.unsplash.com/photo-1752824062296-8e9b1a8162a1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHwzfHxoYXBweSUyMGNvdXBsZSUyMGxhdWdoaW5nJTIwdG9nZXRoZXIlMjBhZXN0aGV0aWN8ZW58MHx8fHwxNzY4ODU2NTc1fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Couple in alley",
+      "usage": "About/Story section"
+    },
+    "virtual_flowers": [
+      {
+        "name": "White Tulip",
+        "url": "https://images.unsplash.com/photo-1746349638932-86d130bc2fcc?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwyfHxzaW5nbGUlMjBmbG93ZXIlMjBpc29sYXRlZCUyMHdoaXRlJTIwYmFja2dyb3VuZCUyMHJvc2UlMjBzdW5mbG93ZXIlMjB0dWxpcCUyMGRhaXN5fGVufDB8fHx8MTc2ODg1NjU3OXww&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "name": "Red Rose",
+        "url": "https://images.unsplash.com/photo-1681053205341-6b915e4e16cd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHwyfHxzaW5nbGUlMjByZWQlMjByb3NlJTIwZmxvd2VyJTIwaXNvbGF0ZWQlMjB3aGl0ZSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzY4ODU2NTk2fDA&ixlib=rb-4.1.0&q=85"
+      },
+      {
+        "name": "Pink Tulip",
+        "url": "https://images.unsplash.com/photo-1714414168274-087a3d6efb55?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwxfHxzaW5nbGUlMjBwaW5rJTIwdHVsaXAlMjBmbG93ZXIlMjBpc29sYXRlZCUyMHdoaXRlJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3Njg4NTY2MDB8MA&ixlib=rb-4.1.0&q=85"
+      }
+    ]
+  },
+  "instructions_to_main_agent": [
+    "1. THEME SETUP: Update tailwind.config.js with the 'Soft Romance' palette. Use the CSS variables provided.",
+    "2. FONT SETUP: Import 'Nunito' and 'Outfit' from Google Fonts in index.css.",
+    "3. LANDING PAGE: Build a 'Hero' that feels like a love letter. Use the 'Happy couple' image with a soft gradient overlay. The CTA 'Create Room' should be massive and pill-shaped.",
+    "4. DASHBOARD: Implement the 'Bento Grid'. The 'Countdown' widget is the heart of the dashboard. Make it tick with a soft pulse animation.",
+    "5. GAMES: For 'Drawing Board', use a canvas with pastel brush colors by default. For 'Truth or Dare', use flip cards with 'bouncy' transitions.",
+    "6. VIRTUAL GARDEN: Display the flower images in a grid. When a user 'sends' one, animate it floating up and fading out.",
+    "7. ACCESSIBILITY: Ensure text contrast is high enough (use the dark charcoal text, not gray). Add aria-labels to all interactive elements.",
+    "8. TESTING: Add data-testid to every button, input, and card."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Avoid 'AI Slop': No generic centered layouts. Use asymmetry.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) for overlays.",
+    "You MUST NOT apply universal transition. Eg: transition: all.",
+    "You MUST NOT center align the app container.",
+    "Always use modern button styles like pill-shaped.",
+    "NEVER use AI assistant Emoji characters like 🤖🧠 etc.",
+    "Every interaction needs micro-animations.",
+    "Use 2-3x more spacing than feels comfortable.",
+    "Prioritize using pre-existing components from src/components/ui when applicable.",
+    "Components MUST use named exports.",
+    "Use sonner for toasts."
+  ]
+}
