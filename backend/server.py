@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,10 +6,10 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
-import uuid
+from typing import List, Optional
+import random
+import string
 from datetime import datetime, timezone
-
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -25,46 +25,234 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# =========================
+# Models
+# =========================
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+class Room(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    code: str
+    partner1_name: Optional[str] = None
+    partner2_name: Optional[str] = None
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class RoomCreate(BaseModel):
+    partner_name: str
 
-# Add your routes to the router instead of directly to app
+class RoomJoin(BaseModel):
+    code: str
+    partner_name: str
+
+class Flower(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    room_code: str
+    sender: str
+    flower_type: str
+    message: Optional[str] = None
+    sent_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class FlowerCreate(BaseModel):
+    room_code: str
+    sender: str
+    flower_type: str
+    message: Optional[str] = None
+
+class Message(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    room_code: str
+    sender: str
+    content: str
+    sent_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class MessageCreate(BaseModel):
+    room_code: str
+    sender: str
+    content: str
+
+class Countdown(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    room_code: str
+    event_name: str
+    target_date: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class CountdownCreate(BaseModel):
+    room_code: str
+    event_name: str
+    target_date: str
+
+class BucketListItem(BaseModel):
+    text: str
+    completed: bool = False
+
+class BucketList(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    room_code: str
+    items: List[BucketListItem] = []
+
+class BucketListUpdate(BaseModel):
+    room_code: str
+    items: List[BucketListItem]
+
+class VirtualHug(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    room_code: str
+    sender: str
+    hug_type: str
+    sent_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class VirtualHugCreate(BaseModel):
+    room_code: str
+    sender: str
+    hug_type: str
+
+# =========================
+# Helper Functions
+# =========================
+
+def generate_room_code():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+# =========================
+# Routes
+# =========================
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Distance Hug API"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
+# Room Routes
+@api_router.post("/rooms/create")
+async def create_room(room_data: RoomCreate):
+    code = generate_room_code()
     
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
+    # Check if code exists
+    existing = await db.rooms.find_one({"code": code}, {"_id": 0})
+    while existing:
+        code = generate_room_code()
+        existing = await db.rooms.find_one({"code": code}, {"_id": 0})
     
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
+    room = Room(
+        code=code,
+        partner1_name=room_data.partner_name
+    )
+    
+    await db.rooms.insert_one(room.model_dump())
+    return {"code": code, "partner_name": room_data.partner_name}
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
+@api_router.post("/rooms/join")
+async def join_room(join_data: RoomJoin):
+    room = await db.rooms.find_one({"code": join_data.code}, {"_id": 0})
     
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
+    if not room:
+        raise HTTPException(status_code=404, detail="Room not found")
     
-    return status_checks
+    if room.get("partner2_name"):
+        raise HTTPException(status_code=400, detail="Room is full")
+    
+    await db.rooms.update_one(
+        {"code": join_data.code},
+        {"$set": {"partner2_name": join_data.partner_name}}
+    )
+    
+    return {
+        "code": join_data.code,
+        "partner1_name": room.get("partner1_name"),
+        "partner2_name": join_data.partner_name
+    }
+
+@api_router.get("/rooms/{code}")
+async def get_room(code: str):
+    room = await db.rooms.find_one({"code": code}, {"_id": 0})
+    
+    if not room:
+        raise HTTPException(status_code=404, detail="Room not found")
+    
+    return room
+
+# Flower Routes
+@api_router.post("/flowers/send")
+async def send_flower(flower_data: FlowerCreate):
+    flower = Flower(**flower_data.model_dump())
+    await db.flowers.insert_one(flower.model_dump())
+    return {"success": True}
+
+@api_router.get("/flowers/{room_code}")
+async def get_flowers(room_code: str):
+    flowers = await db.flowers.find({"room_code": room_code}, {"_id": 0}).sort("sent_at", -1).to_list(100)
+    return flowers
+
+# Message Routes
+@api_router.post("/messages/send")
+async def send_message(message_data: MessageCreate):
+    message = Message(**message_data.model_dump())
+    await db.messages.insert_one(message.model_dump())
+    return {"success": True}
+
+@api_router.get("/messages/{room_code}")
+async def get_messages(room_code: str):
+    messages = await db.messages.find({"room_code": room_code}, {"_id": 0}).sort("sent_at", -1).to_list(100)
+    return messages
+
+# Countdown Routes
+@api_router.post("/countdown/set")
+async def set_countdown(countdown_data: CountdownCreate):
+    existing = await db.countdowns.find_one({"room_code": countdown_data.room_code})
+    
+    if existing:
+        await db.countdowns.update_one(
+            {"room_code": countdown_data.room_code},
+            {"$set": {
+                "event_name": countdown_data.event_name,
+                "target_date": countdown_data.target_date
+            }}
+        )
+    else:
+        countdown = Countdown(**countdown_data.model_dump())
+        await db.countdowns.insert_one(countdown.model_dump())
+    
+    return {"success": True}
+
+@api_router.get("/countdown/{room_code}")
+async def get_countdown(room_code: str):
+    countdown = await db.countdowns.find_one({"room_code": room_code}, {"_id": 0})
+    return countdown if countdown else None
+
+# Bucket List Routes
+@api_router.post("/bucketlist/update")
+async def update_bucket_list(bucket_data: BucketListUpdate):
+    existing = await db.bucketlists.find_one({"room_code": bucket_data.room_code})
+    
+    if existing:
+        await db.bucketlists.update_one(
+            {"room_code": bucket_data.room_code},
+            {"$set": {"items": [item.model_dump() for item in bucket_data.items]}}
+        )
+    else:
+        bucket_list = BucketList(
+            room_code=bucket_data.room_code,
+            items=bucket_data.items
+        )
+        await db.bucketlists.insert_one(bucket_list.model_dump())
+    
+    return {"success": True}
+
+@api_router.get("/bucketlist/{room_code}")
+async def get_bucket_list(room_code: str):
+    bucket_list = await db.bucketlists.find_one({"room_code": room_code}, {"_id": 0})
+    return bucket_list if bucket_list else {"room_code": room_code, "items": []}
+
+# Virtual Hug Routes
+@api_router.post("/hugs/send")
+async def send_hug(hug_data: VirtualHugCreate):
+    hug = VirtualHug(**hug_data.model_dump())
+    await db.hugs.insert_one(hug.model_dump())
+    return {"success": True}
+
+@api_router.get("/hugs/{room_code}")
+async def get_hugs(room_code: str):
+    hugs = await db.hugs.find({"room_code": room_code}, {"_id": 0}).sort("sent_at", -1).to_list(50)
+    return hugs
 
 # Include the router in the main app
 app.include_router(api_router)
