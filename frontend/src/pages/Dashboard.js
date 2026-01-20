@@ -24,9 +24,20 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("garden");
 
   useEffect(() => {
+    // Check if user is authenticated
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    
+    if (!token || !user) {
+      toast.error("Please login first");
+      window.location.href = "/";
+      return;
+    }
+    
+    const userData = JSON.parse(user);
+    setMyName(userData.name);
+    
     fetchRoom();
-    const name = localStorage.getItem(`room_${code}_name`);
-    if (name) setMyName(name);
   }, [code]);
 
   const fetchRoom = async () => {
