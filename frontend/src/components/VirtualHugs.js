@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
@@ -20,20 +20,20 @@ export default function VirtualHugs({ roomCode, myName }) {
   const [hugs, setHugs] = useState([]);
   const [sending, setSending] = useState(false);
 
-  useEffect(() => {
-    fetchHugs();
-    const interval = setInterval(fetchHugs, 5000);
-    return () => clearInterval(interval);
-  }, [roomCode]);
-
-  const fetchHugs = async () => {
+  const fetchHugs = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/hugs/${roomCode}`);
       setHugs(response.data);
     } catch (error) {
       console.error("Failed to fetch hugs", error);
     }
-  };
+  }, [roomCode]);
+
+  useEffect(() => {
+    fetchHugs();
+    const interval = setInterval(fetchHugs, 5000);
+    return () => clearInterval(interval);
+  }, [fetchHugs]);
 
   const sendHug = async (hugType) => {
     setSending(true);
