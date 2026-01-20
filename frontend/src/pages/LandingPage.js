@@ -51,17 +51,17 @@ export default function LandingPage() {
       
       toast.success(isLogin ? "Logged in successfully!" : "Account created!");
       
-      // If registering, show partner name input for room creation
-      if (!isLogin) {
-        setShowAuth(false);
-        // Auto-create room after registration
-        await createRoom(access_token, name.trim());
-      } else {
-        // Try to get existing room or show join option
-        await checkExistingRoom(access_token);
-      }
+      // Navigate to My Spaces
+      navigate("/spaces");
     } catch (error) {
-      toast.error(error.response?.data?.detail || `Failed to ${isLogin ? 'login' : 'register'}`);
+      const errorMsg = error.response?.data?.detail;
+      if (typeof errorMsg === 'string') {
+        toast.error(errorMsg);
+      } else if (Array.isArray(errorMsg)) {
+        toast.error(errorMsg[0]?.msg || "An error occurred");
+      } else {
+        toast.error(`Failed to ${isLogin ? 'login' : 'register'}`);
+      }
     } finally {
       setLoading(false);
     }
