@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,20 +16,7 @@ export default function CountdownTimer({ roomCode }) {
   const [timeLeft, setTimeLeft] = useState({});
   const [editing, setEditing] = useState(false);
 
-  useEffect(() => {
-    fetchCountdown();
-  }, [roomCode]);
-
-  useEffect(() => {
-    if (countdown?.target_date) {
-      const timer = setInterval(() => {
-        calculateTimeLeft();
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [countdown]);
-
-  const fetchCountdown = async () => {
+  const fetchCountdown = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/countdown/${roomCode}`);
       if (response.data) {
@@ -38,9 +25,9 @@ export default function CountdownTimer({ roomCode }) {
     } catch (error) {
       console.error("Failed to fetch countdown", error);
     }
-  };
+  }, [roomCode]);
 
-  const calculateTimeLeft = () => {
+  const calculateTimeLeft = useCallback(() => {
     if (!countdown?.target_date) return;
     
     const difference = new Date(countdown.target_date) - new Date();
@@ -55,7 +42,20 @@ export default function CountdownTimer({ roomCode }) {
     } else {
       setTimeLeft({ expired: true });
     }
-  };
+  }, [countdown]);
+
+  useEffect(() => {
+    fetchCountdown();
+  }, [fetchCountdown]);
+
+  useEffect(() => {
+    if (countdown?.target_date) {
+      const timer = setInterval(() => {
+        calculateTimeLeft();
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [countdown, calculateTimeLeft]);
 
   const saveCountdown = async () => {
     if (!eventName.trim() || !targetDate) {
