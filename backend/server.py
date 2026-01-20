@@ -314,6 +314,17 @@ async def get_room(code: str):
     
     return room
 
+@api_router.get("/rooms/my-rooms")
+async def get_my_rooms(current_user: dict = Depends(get_current_user)):
+    rooms = await db.rooms.find({
+        "$or": [
+            {"partner1_email": current_user["email"]},
+            {"partner2_email": current_user["email"]}
+        ]
+    }, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    return rooms
+
 # Flower Routes
 @api_router.post("/flowers/send")
 async def send_flower(flower_data: FlowerCreate):
