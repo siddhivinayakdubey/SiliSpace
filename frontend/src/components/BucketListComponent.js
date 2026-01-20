@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,18 +15,18 @@ export default function BucketListComponent({ roomCode }) {
   const [newItem, setNewItem] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchBucketList();
-  }, [roomCode]);
-
-  const fetchBucketList = async () => {
+  const fetchBucketList = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/bucketlist/${roomCode}`);
       setItems(response.data.items || []);
     } catch (error) {
       console.error("Failed to fetch bucket list", error);
     }
-  };
+  }, [roomCode]);
+
+  useEffect(() => {
+    fetchBucketList();
+  }, [fetchBucketList]);
 
   const updateBucketList = async (updatedItems) => {
     setLoading(true);
