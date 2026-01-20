@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, Gamepad2, Calendar, ListChecks, Copy } from "lucide-react";
+import { Heart, MessageCircle, Gamepad2, Calendar, ListChecks, Copy, Sparkles } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 import VirtualGarden from "@/components/VirtualGarden";
@@ -12,6 +12,7 @@ import Games from "@/components/Games";
 import CountdownTimer from "@/components/CountdownTimer";
 import BucketListComponent from "@/components/BucketListComponent";
 import VirtualHugs from "@/components/VirtualHugs";
+import ValentineCards from "@/components/ValentineCards";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
