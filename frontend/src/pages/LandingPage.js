@@ -122,8 +122,7 @@ export default function LandingPage() {
           className="text-center mb-20"
         >
           <h1 className="font-heading text-5xl md:text-7xl tracking-tight font-extrabold mb-6" style={{ color: '#4A4A4A' }}>
-            Distance Doesn't <br />
-            <span style={{ color: '#FF8FA3' }}>Matter</span> Anymore
+            <span style={{ color: '#FF8FA3' }}>Sili Spaces</span>
           </h1>
           <p className="text-base md:text-lg leading-relaxed max-w-2xl mx-auto mb-12" style={{ color: '#8A8A8A' }}>
             Stay connected with your loved one through virtual flowers, sweet messages, fun games, and shared moments.
