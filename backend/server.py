@@ -250,21 +250,6 @@ async def get_me(current_user: dict = Depends(get_current_user)):
 # Room Routes
 @api_router.post("/rooms/create")
 async def create_room(room_data: RoomCreate, current_user: dict = Depends(get_current_user)):
-    # Check if user already has a room
-    existing_room = await db.rooms.find_one({
-        "$or": [
-            {"partner1_email": current_user["email"]},
-            {"partner2_email": current_user["email"]}
-        ]
-    }, {"_id": 0})
-    
-    if existing_room:
-        return {
-            "code": existing_room["code"],
-            "partner_name": room_data.partner_name,
-            "existing": True
-        }
-    
     code = generate_room_code()
     
     # Check if code exists
@@ -282,8 +267,7 @@ async def create_room(room_data: RoomCreate, current_user: dict = Depends(get_cu
     await db.rooms.insert_one(room.model_dump())
     return {
         "code": code,
-        "partner_name": room_data.partner_name,
-        "existing": False
+        "partner_name": room_data.partner_name
     }
 
 @api_router.post("/rooms/join")
