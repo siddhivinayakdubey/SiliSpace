@@ -75,7 +75,6 @@ class RoomCreate(BaseModel):
 
 class RoomJoin(BaseModel):
     code: str
-    partner_name: str
 
 class Flower(BaseModel):
     model_config = ConfigDict(extra="ignore")
