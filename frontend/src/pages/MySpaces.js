@@ -138,7 +138,7 @@ export default function MySpaces() {
         >
           <div>
             <h1 className="font-heading text-4xl md:text-5xl font-bold" style={{ color: '#4A4A4A' }}>
-              My Sili Spaces
+              that sili website
             </h1>
             <p className="text-lg mt-2" style={{ color: '#8A8A8A' }}>
               Welcome back, {user?.name}! 💕
