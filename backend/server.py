@@ -305,15 +305,6 @@ async def join_room(join_data: RoomJoin, current_user: dict = Depends(get_curren
         "rejoin": False
     }
 
-@api_router.get("/rooms/{code}")
-async def get_room(code: str):
-    room = await db.rooms.find_one({"code": code}, {"_id": 0})
-    
-    if not room:
-        raise HTTPException(status_code=404, detail="Room not found")
-    
-    return room
-
 @api_router.get("/rooms/my-rooms")
 async def get_my_rooms(current_user: dict = Depends(get_current_user)):
     rooms = await db.rooms.find({
@@ -324,6 +315,15 @@ async def get_my_rooms(current_user: dict = Depends(get_current_user)):
     }, {"_id": 0}).sort("created_at", -1).to_list(100)
     
     return rooms
+
+@api_router.get("/rooms/{code}")
+async def get_room(code: str):
+    room = await db.rooms.find_one({"code": code}, {"_id": 0})
+    
+    if not room:
+        raise HTTPException(status_code=404, detail="Room not found")
+    
+    return room
 
 # Flower Routes
 @api_router.post("/flowers/send")
