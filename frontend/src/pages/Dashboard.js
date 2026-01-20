@@ -24,6 +24,7 @@ export default function Dashboard() {
   const [myName, setMyName] = useState("");
   const [activeTab, setActiveTab] = useState("garden");
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     // Check if user is authenticated
     const token = localStorage.getItem("token");

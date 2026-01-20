@@ -23,6 +23,7 @@ export default function VirtualGarden({ roomCode, myName }) {
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchFlowers();
     const interval = setInterval(fetchFlowers, 5000);

@@ -21,6 +21,7 @@ export default function MySpaces() {
   const [joinCode, setJoinCode] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     checkAuth();
   }, []);

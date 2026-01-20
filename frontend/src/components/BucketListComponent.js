@@ -15,6 +15,7 @@ export default function BucketListComponent({ roomCode }) {
   const [newItem, setNewItem] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchBucketList();
   }, [roomCode]);

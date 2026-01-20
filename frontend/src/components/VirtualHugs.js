@@ -20,6 +20,7 @@ export default function VirtualHugs({ roomCode, myName }) {
   const [hugs, setHugs] = useState([]);
   const [sending, setSending] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchHugs();
     const interval = setInterval(fetchHugs, 5000);

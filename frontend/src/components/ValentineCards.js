@@ -62,6 +62,7 @@ export default function ValentineCards({ roomCode, myName }) {
   const [sending, setSending] = useState(false);
   const [selectedToView, setSelectedToView] = useState(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchCards();
     const interval = setInterval(fetchCards, 5000);

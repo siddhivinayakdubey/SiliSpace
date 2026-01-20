@@ -16,10 +16,12 @@ export default function CountdownTimer({ roomCode }) {
   const [timeLeft, setTimeLeft] = useState({});
   const [editing, setEditing] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchCountdown();
   }, [roomCode]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (countdown?.target_date) {
       const timer = setInterval(() => {

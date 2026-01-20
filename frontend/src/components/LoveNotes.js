@@ -13,6 +13,7 @@ export default function LoveNotes({ roomCode, myName }) {
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchMessages();
     const interval = setInterval(fetchMessages, 3000);
