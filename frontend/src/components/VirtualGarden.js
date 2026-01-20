@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,20 +23,20 @@ export default function VirtualGarden({ roomCode, myName }) {
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
 
-  useEffect(() => {
-    fetchFlowers();
-    const interval = setInterval(fetchFlowers, 5000);
-    return () => clearInterval(interval);
-  }, [roomCode]);
-
-  const fetchFlowers = async () => {
+  const fetchFlowers = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/flowers/${roomCode}`);
       setFlowers(response.data);
     } catch (error) {
       console.error("Failed to fetch flowers", error);
     }
-  };
+  }, [roomCode]);
+
+  useEffect(() => {
+    fetchFlowers();
+    const interval = setInterval(fetchFlowers, 5000);
+    return () => clearInterval(interval);
+  }, [fetchFlowers]);
 
   const sendFlower = async () => {
     if (!selectedFlower) {
