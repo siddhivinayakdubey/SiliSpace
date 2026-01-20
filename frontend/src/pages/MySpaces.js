@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -21,24 +21,7 @@ export default function MySpaces() {
   const [joinCode, setJoinCode] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    const token = localStorage.getItem("token");
-    const userData = localStorage.getItem("user");
-
-    if (!token || !userData) {
-      navigate("/");
-      return;
-    }
-
-    setUser(JSON.parse(userData));
-    await fetchMyRooms(token);
-  };
-
-  const fetchMyRooms = async (token) => {
+  const fetchMyRooms = useCallback(async (token) => {
     try {
       const response = await axios.get(`${API}/rooms/my-rooms`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -50,7 +33,24 @@ export default function MySpaces() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  const checkAuth = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
+
+    if (!token || !userData) {
+      navigate("/");
+      return;
+    }
+
+    setUser(JSON.parse(userData));
+    await fetchMyRooms(token);
+  }, [navigate, fetchMyRooms]);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const handleCreateRoom = async () => {
     if (!partnerName.trim()) {
