@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, Gamepad2, Calendar, ListChecks, Copy, Sparkles } from "lucide-react";
+import { Heart, MessageCircle, Gamepad2, Calendar, ListChecks, Copy, Sparkles, ArrowLeft } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 import VirtualGarden from "@/components/VirtualGarden";
@@ -19,6 +19,7 @@ const API = `${BACKEND_URL}/api`;
 
 export default function Dashboard() {
   const { code } = useParams();
+  const navigate = useNavigate();
   const [room, setRoom] = useState(null);
   const [myName, setMyName] = useState("");
   const [activeTab, setActiveTab] = useState("garden");
