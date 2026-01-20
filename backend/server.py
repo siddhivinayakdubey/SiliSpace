@@ -268,6 +268,18 @@ async def get_hugs(room_code: str):
     hugs = await db.hugs.find({"room_code": room_code}, {"_id": 0}).sort("sent_at", -1).to_list(50)
     return hugs
 
+# Valentine Card Routes
+@api_router.post("/valentine/send")
+async def send_valentine_card(card_data: ValentineCardCreate):
+    card = ValentineCard(**card_data.model_dump())
+    await db.valentine_cards.insert_one(card.model_dump())
+    return {"success": True}
+
+@api_router.get("/valentine/{room_code}")
+async def get_valentine_cards(room_code: str):
+    cards = await db.valentine_cards.find({"room_code": room_code}, {"_id": 0}).sort("sent_at", -1).to_list(50)
+    return cards
+
 # Include the router in the main app
 app.include_router(api_router)
 
