@@ -40,9 +40,32 @@ api_router = APIRouter(prefix="/api")
 # Models
 # =========================
 
+class User(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    email: EmailStr
+    name: str
+    password_hash: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class UserRegister(BaseModel):
+    email: EmailStr
+    name: str
+    password: str
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user: dict
+
 class Room(BaseModel):
     model_config = ConfigDict(extra="ignore")
     code: str
+    partner1_email: Optional[str] = None
+    partner2_email: Optional[str] = None
     partner1_name: Optional[str] = None
     partner2_name: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
