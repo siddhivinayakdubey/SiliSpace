@@ -85,7 +85,7 @@ export default function Dashboard() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-6xl mx-auto">
-          <TabsList className="grid grid-cols-3 md:grid-cols-6 gap-2 bg-white/50 p-2 rounded-3xl mb-8">
+          <TabsList className="grid grid-cols-3 md:grid-cols-7 gap-2 bg-white/50 p-2 rounded-3xl mb-8">
             <TabsTrigger data-testid="tab-garden" value="garden" className="rounded-full flex items-center gap-2">
               <Heart className="w-4 h-4" />
               <span className="hidden sm:inline">Garden</span>
@@ -93,6 +93,10 @@ export default function Dashboard() {
             <TabsTrigger data-testid="tab-notes" value="notes" className="rounded-full flex items-center gap-2">
               <MessageCircle className="w-4 h-4" />
               <span className="hidden sm:inline">Notes</span>
+            </TabsTrigger>
+            <TabsTrigger data-testid="tab-valentine" value="valentine" className="rounded-full flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              <span className="hidden sm:inline">Valentine</span>
             </TabsTrigger>
             <TabsTrigger data-testid="tab-games" value="games" className="rounded-full flex items-center gap-2">
               <Gamepad2 className="w-4 h-4" />
