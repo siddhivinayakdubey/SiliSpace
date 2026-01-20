@@ -81,7 +81,7 @@ export default function Dashboard() {
           
           <div className="text-center">
             <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4" style={{ color: '#4A4A4A' }}>
-              Sili Space
+              that sili website
             </h1>
             <div className="flex items-center justify-center gap-4 mb-4">
               <span className="text-lg" style={{ color: '#8A8A8A' }}>
