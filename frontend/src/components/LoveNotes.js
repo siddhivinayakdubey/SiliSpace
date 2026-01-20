@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,20 +13,20 @@ export default function LoveNotes({ roomCode, myName }) {
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
 
-  useEffect(() => {
-    fetchMessages();
-    const interval = setInterval(fetchMessages, 3000);
-    return () => clearInterval(interval);
-  }, [roomCode]);
-
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/messages/${roomCode}`);
       setMessages(response.data);
     } catch (error) {
       console.error("Failed to fetch messages", error);
     }
-  };
+  }, [roomCode]);
+
+  useEffect(() => {
+    fetchMessages();
+    const interval = setInterval(fetchMessages, 3000);
+    return () => clearInterval(interval);
+  }, [fetchMessages]);
 
   const sendMessage = async () => {
     if (!newMessage.trim()) {
