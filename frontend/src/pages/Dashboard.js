@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,6 +24,18 @@ export default function Dashboard() {
   const [myName, setMyName] = useState("");
   const [activeTab, setActiveTab] = useState("garden");
 
+  const fetchRoom = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.get(`${API}/rooms/${code}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setRoom(response.data);
+    } catch (error) {
+      toast.error("Room not found");
+    }
+  }, [code]);
+
   useEffect(() => {
     // Check if user is authenticated
     const token = localStorage.getItem("token");
@@ -39,19 +51,7 @@ export default function Dashboard() {
     setMyName(userData.name);
     
     fetchRoom();
-  }, [code]);
-
-  const fetchRoom = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const response = await axios.get(`${API}/rooms/${code}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setRoom(response.data);
-    } catch (error) {
-      toast.error("Room not found");
-    }
-  };
+  }, [fetchRoom]);
 
   const copyCode = () => {
     navigator.clipboard.writeText(code);
