@@ -67,35 +67,47 @@ export default function Dashboard() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8 text-center"
+          className="mb-8"
         >
-          <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4" style={{ color: '#4A4A4A' }}>
-            Sili Space
-          </h1>
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <span className="text-lg" style={{ color: '#8A8A8A' }}>
-              Room: <strong className="font-heading" style={{ color: '#FF8FA3' }}>{code}</strong>
-            </span>
-            <Button
-              data-testid="copy-code-btn"
-              variant="outline"
-              size="sm"
-              onClick={copyCode}
-              className="rounded-full"
-            >
-              <Copy className="w-4 h-4" />
-            </Button>
+          <Button
+            data-testid="back-to-spaces-btn"
+            onClick={() => navigate("/spaces")}
+            variant="ghost"
+            className="mb-4 rounded-full"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to My Spaces
+          </Button>
+          
+          <div className="text-center">
+            <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4" style={{ color: '#4A4A4A' }}>
+              Sili Space
+            </h1>
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <span className="text-lg" style={{ color: '#8A8A8A' }}>
+                Room: <strong className="font-heading" style={{ color: '#FF8FA3' }}>{code}</strong>
+              </span>
+              <Button
+                data-testid="copy-code-btn"
+                variant="outline"
+                size="sm"
+                onClick={copyCode}
+                className="rounded-full"
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
+            {partnerName && (
+              <p className="text-base" style={{ color: '#8A8A8A' }}>
+                Connected with <strong style={{ color: '#FF8FA3' }}>{partnerName}</strong> ❤️
+              </p>
+            )}
+            {!partnerName && (
+              <p className="text-base" style={{ color: '#8A8A8A' }}>
+                Share the code with your partner to connect!
+              </p>
+            )}
           </div>
-          {partnerName && (
-            <p className="text-base" style={{ color: '#8A8A8A' }}>
-              Connected with <strong style={{ color: '#FF8FA3' }}>{partnerName}</strong> ❤️
-            </p>
-          )}
-          {!partnerName && (
-            <p className="text-base" style={{ color: '#8A8A8A' }}>
-              Share the code with your partner to connect!
-            </p>
-          )}
         </motion.div>
 
         {/* Tabs */}
