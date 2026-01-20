@@ -67,43 +67,6 @@ export default function LandingPage() {
     }
   };
 
-  const checkExistingRoom = async (token) => {
-    try {
-      // Try to create room (it will return existing if user has one)
-      const response = await axios.post(
-        `${API}/rooms/create`,
-        { partner_name: name.trim() || "User" },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
-      const { code, existing } = response.data;
-      if (existing) {
-        toast.success("Welcome back! Rejoining your room...");
-      }
-      navigate(`/room/${code}`);
-    } catch (error) {
-      // If failed, show join option
-      setShowAuth(false);
-      setShowJoin(true);
-    }
-  };
-
-  const createRoom = async (token, userName) => {
-    try {
-      const response = await axios.post(
-        `${API}/rooms/create`,
-        { partner_name: userName },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const { code } = response.data;
-      toast.success(`Room created! Code: ${code}`);
-      navigate(`/room/${code}`);
-    } catch (error) {
-      toast.error("Failed to create room");
-    }
-  };
-
   const handleJoinRoom = async () => {
     if (!joinCode.trim()) {
       toast.error("Please enter room code");
@@ -129,7 +92,12 @@ export default function LandingPage() {
       toast.success("Joined room successfully!");
       navigate(`/room/${joinCode.trim().toUpperCase()}`);
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Failed to join room");
+      const errorMsg = error.response?.data?.detail;
+      if (typeof errorMsg === 'string') {
+        toast.error(errorMsg);
+      } else {
+        toast.error("Failed to join room");
+      }
     } finally {
       setLoading(false);
     }
