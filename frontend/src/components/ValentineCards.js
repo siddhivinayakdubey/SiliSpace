@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -62,20 +62,20 @@ export default function ValentineCards({ roomCode, myName }) {
   const [sending, setSending] = useState(false);
   const [selectedToView, setSelectedToView] = useState(null);
 
-  useEffect(() => {
-    fetchCards();
-    const interval = setInterval(fetchCards, 5000);
-    return () => clearInterval(interval);
-  }, [roomCode]);
-
-  const fetchCards = async () => {
+  const fetchCards = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/valentine/${roomCode}`);
       setCards(response.data);
     } catch (error) {
       console.error("Failed to fetch valentine cards", error);
     }
-  };
+  }, [roomCode]);
+
+  useEffect(() => {
+    fetchCards();
+    const interval = setInterval(fetchCards, 5000);
+    return () => clearInterval(interval);
+  }, [fetchCards]);
 
   const sendCard = async () => {
     if (!selectedCard) {
