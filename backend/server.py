@@ -249,7 +249,22 @@ async def get_me(current_user: dict = Depends(get_current_user)):
 
 # Room Routes
 @api_router.post("/rooms/create")
-async def create_room(room_data: RoomCreate):
+async def create_room(room_data: RoomCreate, current_user: dict = Depends(get_current_user)):
+    # Check if user already has a room
+    existing_room = await db.rooms.find_one({
+        "$or": [
+            {"partner1_email": current_user["email"]},
+            {"partner2_email": current_user["email"]}
+        ]
+    }, {"_id": 0})
+    
+    if existing_room:
+        return {
+            "code": existing_room["code"],
+            "partner_name": room_data.partner_name,
+            "existing": True
+        }
+    
     code = generate_room_code()
     
     # Check if code exists
@@ -260,31 +275,50 @@ async def create_room(room_data: RoomCreate):
     
     room = Room(
         code=code,
+        partner1_email=current_user["email"],
         partner1_name=room_data.partner_name
     )
     
     await db.rooms.insert_one(room.model_dump())
-    return {"code": code, "partner_name": room_data.partner_name}
+    return {
+        "code": code,
+        "partner_name": room_data.partner_name,
+        "existing": False
+    }
 
 @api_router.post("/rooms/join")
-async def join_room(join_data: RoomJoin):
+async def join_room(join_data: RoomJoin, current_user: dict = Depends(get_current_user)):
     room = await db.rooms.find_one({"code": join_data.code}, {"_id": 0})
     
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")
     
-    if room.get("partner2_name"):
+    # Check if user is already in this room (allow rejoin)
+    if room.get("partner1_email") == current_user["email"] or room.get("partner2_email") == current_user["email"]:
+        return {
+            "code": join_data.code,
+            "partner1_name": room.get("partner1_name"),
+            "partner2_name": room.get("partner2_name"),
+            "rejoin": True
+        }
+    
+    # Check if room is full
+    if room.get("partner2_email"):
         raise HTTPException(status_code=400, detail="Room is full")
     
     await db.rooms.update_one(
         {"code": join_data.code},
-        {"$set": {"partner2_name": join_data.partner_name}}
+        {"$set": {
+            "partner2_email": current_user["email"],
+            "partner2_name": current_user["name"]
+        }}
     )
     
     return {
         "code": join_data.code,
         "partner1_name": room.get("partner1_name"),
-        "partner2_name": join_data.partner_name
+        "partner2_name": current_user["name"],
+        "rejoin": False
     }
 
 @api_router.get("/rooms/{code}")
