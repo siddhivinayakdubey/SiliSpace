@@ -12,50 +12,120 @@ const API = `${BACKEND_URL}/api`;
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const [showAuth, setShowAuth] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
   const [showJoin, setShowJoin] = useState(false);
-  const [showCreate, setShowCreate] = useState(false);
   const [joinCode, setJoinCode] = useState("");
-  const [joinName, setJoinName] = useState("");
-  const [createName, setCreateName] = useState("");
+  
+  // Auth fields
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [partnerName, setPartnerName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleCreateRoom = async () => {
-    if (!createName.trim()) {
+  const handleAuth = async () => {
+    if (!email.trim() || !password.trim()) {
+      toast.error("Please enter email and password");
+      return;
+    }
+
+    if (!isLogin && !name.trim()) {
       toast.error("Please enter your name");
       return;
     }
 
     setLoading(true);
     try {
-      const response = await axios.post(`${API}/rooms/create`, {
-        partner_name: createName.trim()
-      });
-
-      const { code } = response.data;
-      localStorage.setItem(`room_${code}_name`, createName.trim());
-      toast.success(`Room created! Code: ${code}`);
-      navigate(`/room/${code}`);
+      const endpoint = isLogin ? "/auth/login" : "/auth/register";
+      const payload = isLogin 
+        ? { email: email.trim(), password }
+        : { email: email.trim(), password, name: name.trim() };
+      
+      const response = await axios.post(`${API}${endpoint}`, payload);
+      const { access_token, user } = response.data;
+      
+      // Store token and user
+      localStorage.setItem("token", access_token);
+      localStorage.setItem("user", JSON.stringify(user));
+      
+      toast.success(isLogin ? "Logged in successfully!" : "Account created!");
+      
+      // If registering, show partner name input for room creation
+      if (!isLogin) {
+        setShowAuth(false);
+        // Auto-create room after registration
+        await createRoom(access_token, name.trim());
+      } else {
+        // Try to get existing room or show join option
+        await checkExistingRoom(access_token);
+      }
     } catch (error) {
-      toast.error("Failed to create room");
+      toast.error(error.response?.data?.detail || `Failed to ${isLogin ? 'login' : 'register'}`);
     } finally {
       setLoading(false);
     }
   };
 
+  const checkExistingRoom = async (token) => {
+    try {
+      // Try to create room (it will return existing if user has one)
+      const response = await axios.post(
+        `${API}/rooms/create`,
+        { partner_name: name.trim() || "User" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      const { code, existing } = response.data;
+      if (existing) {
+        toast.success("Welcome back! Rejoining your room...");
+      }
+      navigate(`/room/${code}`);
+    } catch (error) {
+      // If failed, show join option
+      setShowAuth(false);
+      setShowJoin(true);
+    }
+  };
+
+  const createRoom = async (token, userName) => {
+    try {
+      const response = await axios.post(
+        `${API}/rooms/create`,
+        { partner_name: userName },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const { code } = response.data;
+      toast.success(`Room created! Code: ${code}`);
+      navigate(`/room/${code}`);
+    } catch (error) {
+      toast.error("Failed to create room");
+    }
+  };
+
   const handleJoinRoom = async () => {
-    if (!joinCode.trim() || !joinName.trim()) {
-      toast.error("Please enter both room code and your name");
+    if (!joinCode.trim()) {
+      toast.error("Please enter room code");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please login first");
+      setShowJoin(false);
+      setShowAuth(true);
       return;
     }
 
     setLoading(true);
     try {
-      await axios.post(`${API}/rooms/join`, {
-        code: joinCode.trim().toUpperCase(),
-        partner_name: joinName.trim()
-      });
+      await axios.post(
+        `${API}/rooms/join`,
+        { code: joinCode.trim().toUpperCase() },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-      localStorage.setItem(`room_${joinCode.trim().toUpperCase()}_name`, joinName.trim());
       toast.success("Joined room successfully!");
       navigate(`/room/${joinCode.trim().toUpperCase()}`);
     } catch (error) {
@@ -93,33 +163,39 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
-              data-testid="create-room-btn"
-              onClick={() => setShowCreate(true)}
+              data-testid="get-started-btn"
+              onClick={() => {
+                setIsLogin(false);
+                setShowAuth(true);
+              }}
               className="rounded-full px-8 py-6 font-bold shadow-lg hover:shadow-xl transition-all duration-300 text-lg"
               style={{ background: 'linear-gradient(90deg, #FF8FA3 0%, #FFB3C1 100%)' }}
             >
               <Heart className="mr-2 h-5 w-5" />
-              Create Your Space
+              Get Started
             </Button>
             <Button
-              data-testid="join-room-btn"
-              onClick={() => setShowJoin(true)}
+              data-testid="login-btn"
+              onClick={() => {
+                setIsLogin(true);
+                setShowAuth(true);
+              }}
               variant="outline"
               className="rounded-full px-8 py-6 font-bold transition-all duration-300 text-lg border-2"
               style={{ borderColor: '#FF8FA3', color: '#FF8FA3' }}
             >
-              Join Partner
+              Login
             </Button>
           </div>
         </motion.div>
 
-        {/* Create Room Modal */}
-        {showCreate && (
+        {/* Auth Modal */}
+        {showAuth && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-            onClick={() => setShowCreate(false)}
+            onClick={() => setShowAuth(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -127,24 +203,57 @@ export default function LandingPage() {
               className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="font-heading text-3xl font-bold mb-6" style={{ color: '#4A4A4A' }}>Create Your Space</h2>
+              <h2 className="font-heading text-3xl font-bold mb-6" style={{ color: '#4A4A4A' }}>
+                {isLogin ? "Welcome Back" : "Create Account"}
+              </h2>
+              
               <Input
-                data-testid="create-name-input"
-                placeholder="Your name"
-                value={createName}
-                onChange={(e) => setCreateName(e.target.value)}
+                data-testid="auth-email-input"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="mb-4 h-12 rounded-2xl"
-                onKeyPress={(e) => e.key === 'Enter' && handleCreateRoom()}
               />
+              
+              {!isLogin && (
+                <Input
+                  data-testid="auth-name-input"
+                  placeholder="Your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mb-4 h-12 rounded-2xl"
+                />
+              )}
+              
+              <Input
+                data-testid="auth-password-input"
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mb-4 h-12 rounded-2xl"
+                onKeyPress={(e) => e.key === 'Enter' && handleAuth()}
+              />
+              
               <Button
-                data-testid="create-room-submit-btn"
-                onClick={handleCreateRoom}
+                data-testid="auth-submit-btn"
+                onClick={handleAuth}
                 disabled={loading}
-                className="w-full rounded-full py-6 font-bold"
+                className="w-full rounded-full py-6 font-bold mb-4"
                 style={{ background: 'linear-gradient(90deg, #FF8FA3 0%, #FFB3C1 100%)' }}
               >
-                {loading ? "Creating..." : "Create Room"}
+                {loading ? "Please wait..." : (isLogin ? "Login" : "Create Account & Start")}
               </Button>
+              
+              <button
+                data-testid="toggle-auth-mode-btn"
+                onClick={() => setIsLogin(!isLogin)}
+                className="text-sm w-full text-center"
+                style={{ color: '#FF8FA3' }}
+              >
+                {isLogin ? "Don't have an account? Sign up" : "Already have an account? Login"}
+              </button>
             </motion.div>
           </motion.div>
         )}
@@ -169,13 +278,6 @@ export default function LandingPage() {
                 placeholder="Room code (e.g., ABC123)"
                 value={joinCode}
                 onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                className="mb-4 h-12 rounded-2xl"
-              />
-              <Input
-                data-testid="join-name-input"
-                placeholder="Your name"
-                value={joinName}
-                onChange={(e) => setJoinName(e.target.value)}
                 className="mb-4 h-12 rounded-2xl"
                 onKeyPress={(e) => e.key === 'Enter' && handleJoinRoom()}
               />
@@ -231,8 +333,8 @@ export default function LandingPage() {
           />
           <FeatureCard
             icon={<Heart className="w-8 h-8" />}
-            title="Virtual Hugs"
-            description="Send warm hugs across the distance"
+            title="Valentine Cards"
+            description="Send adorable valentine cards"
             color="#FFD166"
           />
         </motion.div>
