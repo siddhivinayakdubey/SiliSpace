@@ -132,6 +132,10 @@ export default function Dashboard() {
                 <LoveNotes roomCode={code} myName={myName} />
               </TabsContent>
 
+              <TabsContent value="valentine">
+                <ValentineCards roomCode={code} myName={myName} />
+              </TabsContent>
+
               <TabsContent value="games">
                 <Games roomCode={code} myName={myName} />
               </TabsContent>
