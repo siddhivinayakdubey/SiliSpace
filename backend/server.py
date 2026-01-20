@@ -106,6 +106,20 @@ class VirtualHugCreate(BaseModel):
     sender: str
     hug_type: str
 
+class ValentineCard(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    room_code: str
+    sender: str
+    card_type: str
+    message: str
+    sent_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class ValentineCardCreate(BaseModel):
+    room_code: str
+    sender: str
+    card_type: str
+    message: str
+
 # =========================
 # Helper Functions
 # =========================
