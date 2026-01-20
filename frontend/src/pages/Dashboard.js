@@ -41,8 +41,11 @@ export default function Dashboard() {
   }, [code]);
 
   const fetchRoom = async () => {
+    const token = localStorage.getItem("token");
     try {
-      const response = await axios.get(`${API}/rooms/${code}`);
+      const response = await axios.get(`${API}/rooms/${code}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setRoom(response.data);
     } catch (error) {
       toast.error("Room not found");
